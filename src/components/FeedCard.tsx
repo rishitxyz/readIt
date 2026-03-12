@@ -2,8 +2,8 @@ import React from 'react'
 import { View, Image, StyleSheet } from 'react-native'
 import { Card, Text, IconButton, useTheme } from 'react-native-paper'
 import type { MD3Theme } from 'react-native-paper'
-import { FeedItem } from '../services/mockData'
 import { spacing, shapes } from '../theme/theme'
+import { FeedItem } from '../types/feed'
 
 interface FeedCardProps {
   item: FeedItem

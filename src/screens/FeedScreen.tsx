@@ -14,11 +14,13 @@ import { RootStackParamList } from '../navigation/types'
 import { FeedItem, GroupedFeedItem } from '../types/feed'
 import { fetchAll } from '../services/feed-service'
 import { FEED_SOURCES } from '../config/feed-source'
+import AddNewSource from '../components/modals/AddNewSource'
 
 export default function FeedScreen() {
   const theme = useTheme<MD3Theme>()
   const [filter, setFilter] = useState<FilterValue>('all')
   const [feeds, setFeeds] = useState<GroupedFeedItem[]>([])
+  const [addNewSource, setAddNewSource] = useState<boolean>(false)
   const { fabAnimValue, onScroll } = useScrollAnimation()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -173,10 +175,12 @@ export default function FeedScreen() {
       />
       <AnimatedFAB
         animValue={fabAnimValue}
+        icon={addNewSource ? 'close' : 'plus'}
         onPress={() => {
-          // TODO: Open modal to add new feed.
+          setAddNewSource(!addNewSource)
         }}
       />
+      <AddNewSource visible={addNewSource} setVisible={setAddNewSource} />
     </View>
   )
 }

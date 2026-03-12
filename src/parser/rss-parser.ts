@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
-import { FeedItem } from '../services/mockData'
+import { FeedItem } from '../types/feed'
 
 const parser = new XMLParser({
   ignoreAttributes: false,
