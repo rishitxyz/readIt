@@ -1,43 +1,43 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { PaperProvider, BottomNavigation, useTheme } from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
+import React, { useState, useCallback, useMemo } from 'react'
+import { StatusBar } from 'expo-status-bar'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { PaperProvider, BottomNavigation, useTheme } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
+import { StyleSheet } from 'react-native'
+import * as SplashScreen from 'expo-splash-screen'
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { RootStackParamList } from './src/navigation/types';
-import ArticleScreen from './src/screens/ArticleScreen';
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { RootStackParamList } from './src/navigation/types'
+import ArticleScreen from './src/screens/ArticleScreen'
 
 // ── Font Imports ─────────────────────────────────────────────────────
-import { 
-  useFonts, 
-  FiraSans_400Regular, 
-  FiraSans_500Medium, 
-  FiraSans_600SemiBold, 
-  FiraSans_700Bold 
-} from '@expo-google-fonts/fira-sans';
+import {
+  useFonts,
+  FiraSans_400Regular,
+  FiraSans_500Medium,
+  FiraSans_600SemiBold,
+  FiraSans_700Bold,
+} from '@expo-google-fonts/fira-sans'
 
-import { LightTheme, DarkTheme } from './src/theme/theme';
-import FeedScreen from './src/screens/FeedScreen';
-import FavoritesScreen from './src/screens/FavoritesScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
+import { LightTheme, DarkTheme } from './src/theme/theme'
+import FeedScreen from './src/screens/FeedScreen'
+import FavoritesScreen from './src/screens/FavoritesScreen'
+import SettingsScreen from './src/screens/SettingsScreen'
 
 // Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 // Navigation
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>()
 
 // ── Route definitions for Bottom Navigation ──────────────────────────
 type RouteDef = {
-  key: string;
-  title: string;
-  focusedIcon: string;
-  unfocusedIcon: string;
-};
+  key: string
+  title: string
+  focusedIcon: string
+  unfocusedIcon: string
+}
 
 const routes: RouteDef[] = [
   {
@@ -58,44 +58,39 @@ const routes: RouteDef[] = [
     focusedIcon: 'cog',
     unfocusedIcon: 'cog-outline',
   },
-];
+]
 
 // ── Main App wrapper (inside PaperProvider) ──────────────────────────
 function AppContent({
   isDarkMode,
   onToggleDarkMode,
 }: {
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
+  isDarkMode: boolean
+  onToggleDarkMode: () => void
 }) {
-  const theme = useTheme<MD3Theme>();
-  const [index, setIndex] = useState(0);
+  const theme = useTheme<MD3Theme>()
+  const [index, setIndex] = useState(0)
 
   const renderScene = useCallback(
     ({ route }: { route: RouteDef }) => {
       switch (route.key) {
         case 'feeds':
-          return <FeedScreen />;
+          return <FeedScreen />
         case 'favorites':
-          return <FavoritesScreen />;
+          return <FavoritesScreen />
         case 'settings':
-          return (
-            <SettingsScreen
-              isDarkMode={isDarkMode}
-              onToggleDarkMode={onToggleDarkMode}
-            />
-          );
+          return <SettingsScreen isDarkMode={isDarkMode} onToggleDarkMode={onToggleDarkMode} />
         default:
-          return null;
+          return null
       }
     },
     [isDarkMode, onToggleDarkMode],
-  );
+  )
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      edges={['top']}
+      edges={[]}
     >
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <BottomNavigation
@@ -114,12 +109,12 @@ function AppContent({
         theme={theme}
       />
     </SafeAreaView>
-  );
+  )
 }
 
 // ── Root App ─────────────────────────────────────────────────────────
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   // 1. Load the FiraSans fonts
   const [fontsLoaded, fontError] = useFonts({
@@ -127,24 +122,24 @@ export default function App() {
     FiraSans_500Medium,
     FiraSans_600SemiBold,
     FiraSans_700Bold,
-  });
+  })
 
   // 2. Hide splash screen when fonts are ready
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
-      await SplashScreen.hideAsync();
+      await SplashScreen.hideAsync()
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError])
 
   const toggleDarkMode = useCallback(() => {
-    setIsDarkMode((prev) => !prev);
-  }, []);
+    setIsDarkMode((prev) => !prev)
+  }, [])
 
-  const theme = useMemo(() => (isDarkMode ? DarkTheme : LightTheme), [isDarkMode]);
+  const theme = useMemo(() => (isDarkMode ? DarkTheme : LightTheme), [isDarkMode])
 
   // 3. Render nothing until fonts are loaded (splash screen remains)
   if (!fontsLoaded && !fontError) {
-    return null;
+    return null
   }
 
   return (
@@ -152,23 +147,20 @@ export default function App() {
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <PaperProvider theme={theme}>
         <NavigationContainer>
-          <Stack.Navigator screenOptions={{headerShown: false}}>
-            <Stack.Screen
-              name="MainTabs"
-              children={() => (
-                <AppContent isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
-              )}
-            />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="MainTabs">
+              {() => <AppContent isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />}
+            </Stack.Screen>
             <Stack.Screen name="ArticleDetail" component={ArticleScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
     </SafeAreaProvider>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-});
+})

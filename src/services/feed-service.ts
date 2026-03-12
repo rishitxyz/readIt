@@ -1,4 +1,4 @@
-import { FeedSource } from '../config/feed-source'
+import { FeedSource, ITEMS_PER_FEED } from '../config/feed-source'
 import { parseXMLFeed } from '../parser/rss-parser'
 import { FeedItem, GroupedFeedItem } from '../types/feed'
 
@@ -19,7 +19,7 @@ export const fetchAll = async (sources: FeedSource[]): Promise<GroupedFeedItem[]
       const feedItems = [...result.value].sort(
         (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
       )
-      return [{ source: source.name, feedItems: feedItems.slice(0, 3) }]
+      return [{ source: source.name, feedItems: feedItems.slice(0, ITEMS_PER_FEED) }]
     }
 
     console.log(`Failed to load RSS feeds from ${source.name}, reason: ${String(result.reason)}`)

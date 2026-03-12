@@ -10,6 +10,8 @@ export interface FeedSource {
   type: FeedType
 }
 
+export const ITEMS_PER_FEED: number = 1
+
 export const generateRedditSource = (subreddit: string): FeedSource => {
   return {
     id: `r/${subreddit.toLowerCase()}`,
@@ -26,10 +28,10 @@ export const FEED_SOURCES: FeedSource[] = [
     url: 'https://www.theverge.com/rss/index.xml',
     type: FeedType.RSS,
   },
-  // {
-  //     id: 'androidauthority',
-  //     name: 'Android Authority',
-  //     url: '',
-  //     type: FeedType.RSS
-  // },
+  {
+    id: 'androidauthority',
+    name: 'Android Authority',
+    url: 'https://www.androidauthority.com/feed',
+    type: FeedType.RSS,
+  },
 ]

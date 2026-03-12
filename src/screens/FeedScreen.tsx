@@ -26,9 +26,19 @@ export default function FeedScreen() {
   const filteredItems = useMemo(() => {
     switch (filter) {
       case 'unread':
-        return feeds.filter((item) => !item.isRead)
+        return feeds
+          .map((feed) => ({
+            ...feed,
+            feedItems: feed.feedItems.filter((item) => !item.isRead),
+          }))
+          .filter((feed) => feed.feedItems.length > 0)
       case 'favorites':
-        return feeds.filter((item) => item.isFavorite)
+        return feeds
+          .map((feed) => ({
+            ...feed,
+            feedItems: feed.feedItems.filter((item) => item.isFavorite),
+          }))
+          .filter((feed) => feed.feedItems.length > 0)
       default:
         return feeds
     }
@@ -36,14 +46,26 @@ export default function FeedScreen() {
 
   const toggleFavorite = useCallback((feedItemId: string) => {
     setFeeds((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, isFavorite: !item.isFavorite } : item)),
+      prev.map((group) => ({
+        ...group,
+        feedItems: group.feedItems.map((feedItem) =>
+          feedItem.id === feedItemId ? { ...feedItem, isFavorite: !feedItem.isFavorite } : feedItem,
+        ),
+      })),
     )
   }, [])
 
   const handleCardPress = useCallback(
     (item: FeedItem) => {
       // Mark as read on press
-      setFeeds((prev) => prev.map((f) => (f.id === item.id ? { ...f, isRead: true } : f)))
+      setFeeds((prev) =>
+        prev.map((group) => ({
+          ...group,
+          feedItems: group.feedItems.map((feedItem) =>
+            feedItem.id === item.id ? { ...feedItem, isRead: true } : feedItem,
+          ),
+        })),
+      )
 
       // handle navigation to article page.
       navigation.navigate('ArticleDetail', { article: item })
@@ -57,8 +79,6 @@ export default function FeedScreen() {
     ),
     [toggleFavorite, handleCardPress],
   )
-
-  const keyExtractor = useCallback((item: FeedItem) => item.id, [])
 
   useEffect(() => {
     let isMounted = true
@@ -74,6 +94,13 @@ export default function FeedScreen() {
       isMounted = false
     }
   }, [])
+
+  const sections = useMemo(() => {
+    return filteredItems.map((feed) => ({
+      title: feed.source,
+      data: feed.feedItems,
+    }))
+  }, [filteredItems])
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -99,48 +126,51 @@ export default function FeedScreen() {
         />
       </Appbar.Header>
 
-      {/* Filter Chips */}
       <FeedFilter value={filter} onChange={setFilter} />
 
-      {/* Feed List */}
-      {feeds.map(({ source, feedItems }) => (
-        <>
-          <Text variant="headlineMedium">{source}</Text>
-          <Animated.FlatList
-            data={feedItems}
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-            onScroll={onScroll}
-            scrollEventThrottle={16}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Text
-                  variant="headlineSmall"
-                  style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}
-                >
-                  No articles found
-                </Text>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    color: theme.colors.onSurfaceVariant,
-                    textAlign: 'center',
-                    marginTop: spacing.sm,
-                  }}
-                >
-                  {filter === 'favorites'
-                    ? 'Heart some articles to see them here!'
-                    : 'All caught up!'}
-                </Text>
-              </View>
-            }
-          />
-        </>
-      ))}
-
-      {/* Animated Extended FAB */}
+      <Animated.SectionList
+        sections={sections}
+        keyExtractor={(item, index) => item.id + index}
+        renderItem={renderItem}
+        renderSectionHeader={({ section: { title } }) => (
+          <View
+            style={{
+              paddingHorizontal: spacing.md,
+              paddingVertical: spacing.sm,
+              backgroundColor: theme.colors.background,
+            }}
+          >
+            <Text variant="titleLarge" style={{ color: theme.colors.primary, fontWeight: 'bold' }}>
+              {title}
+            </Text>
+          </View>
+        )}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        // ── Empty State ──
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text
+              variant="headlineSmall"
+              style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}
+            >
+              No articles found
+            </Text>
+            <Text
+              variant="bodyMedium"
+              style={{
+                color: theme.colors.onSurfaceVariant,
+                textAlign: 'center',
+                marginTop: spacing.sm,
+              }}
+            >
+              {filter === 'favorites' ? 'Heart some articles to see them here!' : 'All caught up!'}
+            </Text>
+          </View>
+        }
+      />
       <AnimatedFAB
         animValue={fabAnimValue}
         onPress={() => {
@@ -156,7 +186,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingTop: spacing.sm,
     paddingBottom: 96, // Space for FAB
   },
   emptyContainer: {

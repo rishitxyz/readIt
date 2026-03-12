@@ -28,17 +28,14 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
     >
       {/* Hero Image */}
       {item.image && (
-        <View style={[styles.imageContainer, { borderRadius: shapes.extraLarge }]}>
-          <Image
-            source={{ uri: item.image }}
-            style={[
-              styles.image,
-              { borderTopLeftRadius: shapes.extraLarge, borderTopRightRadius: shapes.extraLarge },
-            ]}
-            resizeMode="cover"
-          />
+        <View
+          style={[
+            styles.imageContainer,
+            { borderTopLeftRadius: shapes.extraLarge, borderTopRightRadius: shapes.extraLarge },
+          ]}
+        >
+          <Image source={{ uri: item.image }} style={[styles.image]} resizeMode="cover" />
 
-          {/* Unread indicator dot */}
           {!item.isRead && (
             <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary }]} />
           )}
