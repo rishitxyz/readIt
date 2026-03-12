@@ -1,33 +1,19 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import {
-  Text,
-  Appbar,
-  List,
-  Switch,
-  Divider,
-  useTheme,
-} from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import { spacing } from '../theme/theme';
+import React from 'react'
+import { View, StyleSheet, ScrollView } from 'react-native'
+import { Appbar, List, Switch, Divider, useTheme } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
 
 interface SettingsScreenProps {
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
+  isDarkMode: boolean
+  onToggleDarkMode: () => void
 }
 
-export default function SettingsScreen({
-  isDarkMode,
-  onToggleDarkMode,
-}: SettingsScreenProps) {
-  const theme = useTheme<MD3Theme>();
+export default function SettingsScreen({ isDarkMode, onToggleDarkMode }: SettingsScreenProps) {
+  const theme = useTheme<MD3Theme>()
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header
-        elevated
-        style={{ backgroundColor: theme.colors.surface }}
-      >
+      <Appbar.Header elevated style={{ backgroundColor: theme.colors.surface }}>
         <Appbar.Content
           title="Settings"
           titleStyle={{
@@ -41,9 +27,7 @@ export default function SettingsScreen({
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Appearance Section */}
         <List.Section>
-          <List.Subheader
-            style={{ color: theme.colors.primary, fontWeight: '600' }}
-          >
+          <List.Subheader style={{ color: theme.colors.primary, fontWeight: '600' }}>
             Appearance
           </List.Subheader>
 
@@ -69,9 +53,7 @@ export default function SettingsScreen({
 
         {/* Feed Settings */}
         <List.Section>
-          <List.Subheader
-            style={{ color: theme.colors.primary, fontWeight: '600' }}
-          >
+          <List.Subheader style={{ color: theme.colors.primary, fontWeight: '600' }}>
             Feed Settings
           </List.Subheader>
 
@@ -104,9 +86,7 @@ export default function SettingsScreen({
 
         {/* About */}
         <List.Section>
-          <List.Subheader
-            style={{ color: theme.colors.primary, fontWeight: '600' }}
-          >
+          <List.Subheader style={{ color: theme.colors.primary, fontWeight: '600' }}>
             About
           </List.Subheader>
 
@@ -122,11 +102,11 @@ export default function SettingsScreen({
         </List.Section>
       </ScrollView>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-});
+})

@@ -1,92 +1,84 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import { Text, Appbar, useTheme } from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import FeedCard from '../components/FeedCard';
-import AnimatedFAB from '../components/AnimatedFAB';
-import FeedFilter, { FilterValue } from '../components/FeedFilter';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
-import { spacing } from '../theme/theme';
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import { View, StyleSheet, Animated } from 'react-native'
+import { Text, Appbar, useTheme } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
+import FeedCard from '../components/FeedCard'
+import AnimatedFAB from '../components/AnimatedFAB'
+import FeedFilter, { FilterValue } from '../components/FeedFilter'
+import { useScrollAnimation } from '../hooks/useScrollAnimation'
+import { spacing } from '../theme/theme'
 
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-import { FeedItem, GroupedFeedItem } from '../types/feed';
-import { fetchAll } from '../services/feed-service';
-import { FEED_SOURCES } from '../config/feed-source';
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RootStackParamList } from '../navigation/types'
+import { FeedItem, GroupedFeedItem } from '../types/feed'
+import { fetchAll } from '../services/feed-service'
+import { FEED_SOURCES } from '../config/feed-source'
 
 export default function FeedScreen() {
-  const theme = useTheme<MD3Theme>();
-  const [filter, setFilter] = useState<FilterValue>('all');
-  const [feeds, setFeeds] = useState<GroupedFeedItem[]>([]);
-  const { fabAnimValue, onScroll } = useScrollAnimation();
+  const theme = useTheme<MD3Theme>()
+  const [filter, setFilter] = useState<FilterValue>('all')
+  const [feeds, setFeeds] = useState<GroupedFeedItem[]>([])
+  const { fabAnimValue, onScroll } = useScrollAnimation()
 
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const filteredItems = useMemo(() => {
     switch (filter) {
       case 'unread':
-        return feeds.filter((item) => !item.isRead);
+        return feeds.filter((item) => !item.isRead)
       case 'favorites':
-        return feeds.filter((item) => item.isFavorite);
+        return feeds.filter((item) => item.isFavorite)
       default:
-        return feeds;
+        return feeds
     }
-  }, [filter, feeds]);
+  }, [filter, feeds])
 
   const toggleFavorite = useCallback((feedItemId: string) => {
     setFeeds((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item,
-      ),
-    );
-  }, []);
+      prev.map((item) => (item.id === id ? { ...item, isFavorite: !item.isFavorite } : item)),
+    )
+  }, [])
 
-  const handleCardPress = useCallback((item: FeedItem) => {
-    // Mark as read on press
-    setFeeds((prev) =>
-      prev.map((f) => (f.id === item.id ? { ...f, isRead: true } : f)),
-    );
+  const handleCardPress = useCallback(
+    (item: FeedItem) => {
+      // Mark as read on press
+      setFeeds((prev) => prev.map((f) => (f.id === item.id ? { ...f, isRead: true } : f)))
 
-    // handle navigation to article page.
-    navigation.navigate('ArticleDetail', {article: item})
-  }, [navigation]);
+      // handle navigation to article page.
+      navigation.navigate('ArticleDetail', { article: item })
+    },
+    [navigation],
+  )
 
   const renderItem = useCallback(
     ({ item }: { item: FeedItem }) => (
-      <FeedCard
-        item={item}
-        onToggleFavorite={toggleFavorite}
-        onPress={handleCardPress}
-      />
+      <FeedCard item={item} onToggleFavorite={toggleFavorite} onPress={handleCardPress} />
     ),
     [toggleFavorite, handleCardPress],
-  );
+  )
 
-  const keyExtractor = useCallback((item: FeedItem) => item.id, []);
+  const keyExtractor = useCallback((item: FeedItem) => item.id, [])
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
     const load = async () => {
-      const fetchedFeeds = await fetchAll(FEED_SOURCES);
-      if (isMounted) setFeeds(fetchedFeeds);
-    };
+      const fetchedFeeds = await fetchAll(FEED_SOURCES)
+      if (isMounted) setFeeds(fetchedFeeds)
+    }
 
-    void load();
+    void load()
 
     return () => {
-      isMounted = false;
-    };
-  }, []);
+      isMounted = false
+    }
+  }, [])
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* App Bar */}
-      <Appbar.Header
-        elevated
-        style={{ backgroundColor: theme.colors.surface }}
-      >
+      <Appbar.Header elevated style={{ backgroundColor: theme.colors.surface }}>
         <Appbar.Content
           title="ReadIt"
           titleStyle={{
@@ -111,37 +103,42 @@ export default function FeedScreen() {
       <FeedFilter value={filter} onChange={setFilter} />
 
       {/* Feed List */}
-      {
-        feeds.map(({ source, feedItems }) => <>
-        <Text variant='headlineMedium'>{source}</Text>
-        <Animated.FlatList
-        data={feedItems}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text
-              variant="headlineSmall"
-              style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}
-            >
-              No articles found
-            </Text>
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: spacing.sm }}
-            >
-              {filter === 'favorites'
-                ? 'Heart some articles to see them here!'
-                : 'All caught up!'}
-            </Text>
-          </View>
-        }
-      /></>)
-      }
+      {feeds.map(({ source, feedItems }) => (
+        <>
+          <Text variant="headlineMedium">{source}</Text>
+          <Animated.FlatList
+            data={feedItems}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text
+                  variant="headlineSmall"
+                  style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}
+                >
+                  No articles found
+                </Text>
+                <Text
+                  variant="bodyMedium"
+                  style={{
+                    color: theme.colors.onSurfaceVariant,
+                    textAlign: 'center',
+                    marginTop: spacing.sm,
+                  }}
+                >
+                  {filter === 'favorites'
+                    ? 'Heart some articles to see them here!'
+                    : 'All caught up!'}
+                </Text>
+              </View>
+            }
+          />
+        </>
+      ))}
 
       {/* Animated Extended FAB */}
       <AnimatedFAB
@@ -151,7 +148,7 @@ export default function FeedScreen() {
         }}
       />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -169,4 +166,4 @@ const styles = StyleSheet.create({
     paddingTop: 120,
     paddingHorizontal: spacing.xl,
   },
-});
+})

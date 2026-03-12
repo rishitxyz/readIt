@@ -1,18 +1,18 @@
-import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import { Card, Text, IconButton, useTheme } from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import { FeedItem } from '../services/mockData';
-import { spacing, shapes } from '../theme/theme';
+import React from 'react'
+import { View, Image, StyleSheet } from 'react-native'
+import { Card, Text, IconButton, useTheme } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
+import { FeedItem } from '../services/mockData'
+import { spacing, shapes } from '../theme/theme'
 
 interface FeedCardProps {
-  item: FeedItem;
-  onToggleFavorite?: (id: string) => void;
-  onPress?: (item: FeedItem) => void;
+  item: FeedItem
+  onToggleFavorite?: (id: string) => void
+  onPress?: (item: FeedItem) => void
 }
 
 export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardProps) {
-  const theme = useTheme<MD3Theme>();
+  const theme = useTheme<MD3Theme>()
 
   return (
     <Card
@@ -27,39 +27,31 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
       onPress={() => onPress?.(item)}
     >
       {/* Hero Image */}
-     {
-      item.image &&  <View style={[styles.imageContainer, { borderRadius: shapes.extraLarge }]}>
-        <Image
-          source={{ uri: item.image }}
-          style={[styles.image, { borderTopLeftRadius: shapes.extraLarge, borderTopRightRadius: shapes.extraLarge }]}
-          resizeMode="cover"
-        />
-
-        {/* Unread indicator dot */}
-        {!item.isRead && (
-          <View
+      {item.image && (
+        <View style={[styles.imageContainer, { borderRadius: shapes.extraLarge }]}>
+          <Image
+            source={{ uri: item.image }}
             style={[
-              styles.unreadDot,
-              { backgroundColor: theme.colors.primary },
+              styles.image,
+              { borderTopLeftRadius: shapes.extraLarge, borderTopRightRadius: shapes.extraLarge },
             ]}
+            resizeMode="cover"
           />
-        )}
-      </View>
-     }
+
+          {/* Unread indicator dot */}
+          {!item.isRead && (
+            <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary }]} />
+          )}
+        </View>
+      )}
 
       <Card.Content style={styles.content}>
         {/* Source & Timestamp row */}
         <View style={styles.metaRow}>
-          <Text
-            variant="labelMedium"
-            style={{ color: theme.colors.primary, fontWeight: '600' }}
-          >
+          <Text variant="labelMedium" style={{ color: theme.colors.primary, fontWeight: '600' }}>
             {item.source}
           </Text>
-          <Text
-            variant="labelSmall"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
             {item.timestamp}
           </Text>
         </View>
@@ -76,7 +68,7 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
         {/* Summary */}
         <Text
           variant="bodyMedium"
-          numberOfLines={item.image != undefined ? 3 : 10}
+          numberOfLines={item.image !== undefined ? 3 : 10}
           style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}
         >
           {item.description}
@@ -105,7 +97,7 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
         />
       </Card.Actions>
     </Card>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -151,4 +143,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingBottom: spacing.xs,
   },
-});
+})

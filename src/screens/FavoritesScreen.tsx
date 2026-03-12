@@ -1,18 +1,15 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Appbar, useTheme, Card, IconButton } from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import { spacing, shapes } from '../theme/theme';
+import React from 'react'
+import { View, StyleSheet, ScrollView } from 'react-native'
+import { Text, Appbar, useTheme, Card, IconButton } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
+import { spacing, shapes } from '../theme/theme'
 
 export default function FavoritesScreen() {
-  const theme = useTheme<MD3Theme>();
+  const theme = useTheme<MD3Theme>()
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header
-        elevated
-        style={{ backgroundColor: theme.colors.surface }}
-      >
+      <Appbar.Header elevated style={{ backgroundColor: theme.colors.surface }}>
         <Appbar.Content
           title="Favorites"
           titleStyle={{
@@ -23,10 +20,7 @@ export default function FavoritesScreen() {
         />
       </Appbar.Header>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Placeholder state */}
         <Card
           style={[
@@ -65,7 +59,7 @@ export default function FavoritesScreen() {
         </Card>
       </ScrollView>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -86,4 +80,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
   },
-});
+})

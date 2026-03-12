@@ -1,26 +1,21 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { SegmentedButtons, useTheme } from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import { spacing } from '../theme/theme';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import { SegmentedButtons, useTheme } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
+import { spacing } from '../theme/theme'
 
-export type FilterValue = 'all' | 'unread' | 'favorites';
+export type FilterValue = 'all' | 'unread' | 'favorites'
 
 interface FeedFilterProps {
-  value: FilterValue;
-  onChange: (value: FilterValue) => void;
+  value: FilterValue
+  onChange: (value: FilterValue) => void
 }
 
 export default function FeedFilter({ value, onChange }: FeedFilterProps) {
-  const theme = useTheme<MD3Theme>();
+  const theme = useTheme<MD3Theme>()
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.surface },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
       <SegmentedButtons
         value={value}
         onValueChange={(val) => onChange(val as FilterValue)}
@@ -50,7 +45,7 @@ export default function FeedFilter({ value, onChange }: FeedFilterProps) {
         style={styles.buttons}
       />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -61,4 +56,4 @@ const styles = StyleSheet.create({
   buttons: {
     // RNP will handle styling internally
   },
-});
+})

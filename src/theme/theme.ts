@@ -1,9 +1,4 @@
-import {
-  MD3LightTheme,
-  MD3DarkTheme,
-  configureFonts,
-  MD3Theme,
-} from 'react-native-paper';
+import { MD3LightTheme, MD3DarkTheme, configureFonts, MD3Theme } from 'react-native-paper'
 
 // ── M3 Expressive Spacing Tokens (8dp grid) ──────────────────────────
 export const spacing = {
@@ -14,7 +9,7 @@ export const spacing = {
   xl: 32,
   xxl: 40,
   xxxl: 48,
-} as const;
+} as const
 
 // ── M3 Expressive Shape Tokens ───────────────────────────────────────
 export const shapes = {
@@ -25,11 +20,15 @@ export const shapes = {
   large: 16,
   extraLarge: 28,
   full: 9999,
-} as const;
+} as const
 
 // ... (Keep your lightColors and darkColors exactly as they are) ...
-const lightColors = { /* ... */ };
-const darkColors = { /* ... */ };
+const lightColors = {
+  /* ... */
+}
+const darkColors = {
+  /* ... */
+}
 
 // ── M3 Expressive Typography (Updated for FiraSans) ───────────────────
 // Note: We use the exact string names exported by @expo-google-fonts/FiraSans
@@ -140,9 +139,9 @@ const fontConfig = {
     letterSpacing: 0.5,
     lineHeight: 16,
   },
-};
+}
 
-const fonts = configureFonts({ config: fontConfig });
+const fonts = configureFonts({ config: fontConfig })
 
 // ── Export Themes ────────────────────────────────────────────────────
 export const LightTheme: MD3Theme = {
@@ -153,7 +152,7 @@ export const LightTheme: MD3Theme = {
   },
   fonts,
   roundness: shapes.extraLarge,
-};
+}
 
 export const DarkTheme: MD3Theme = {
   ...MD3DarkTheme,
@@ -163,4 +162,4 @@ export const DarkTheme: MD3Theme = {
   },
   fonts,
   roundness: shapes.extraLarge,
-};
+}

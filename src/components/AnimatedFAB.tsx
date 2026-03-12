@@ -1,15 +1,15 @@
-import React from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
-import type { MD3Theme } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { shapes, spacing } from '../theme/theme';
+import React from 'react'
+import { Animated, StyleSheet, View } from 'react-native'
+import { useTheme } from 'react-native-paper'
+import type { MD3Theme } from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { shapes, spacing } from '../theme/theme'
 
 interface AnimatedFABProps {
-  animValue: Animated.Value; // 0 = expanded, 1 = collapsed
-  onPress: () => void;
-  label?: string;
-  icon?: string;
+  animValue: Animated.Value // 0 = expanded, 1 = collapsed
+  onPress: () => void
+  label?: string
+  icon?: string
 }
 
 export default function AnimatedFAB({
@@ -18,13 +18,13 @@ export default function AnimatedFAB({
   label = 'Add Feed',
   icon = 'plus',
 }: AnimatedFABProps) {
-  const theme = useTheme<MD3Theme>();
+  const theme = useTheme<MD3Theme>()
 
   const scale = animValue.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: [1, 0.95, 1],
     extrapolate: 'clamp',
-  });
+  })
 
   return (
     <Animated.View
@@ -48,7 +48,7 @@ export default function AnimatedFAB({
         </View>
       </Animated.View>
     </Animated.View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -79,4 +79,4 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: '600',
   },
-});
+})

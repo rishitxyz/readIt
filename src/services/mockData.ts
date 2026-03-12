@@ -1,12 +1,12 @@
 export interface FeedItem {
-  id: string;
-  title: string;
-  source: string;
-  timestamp: string;
-  description: string;
-  image: string;
-  isRead: boolean;
-  isFavorite: boolean;
+  id: string
+  title: string
+  source: string
+  timestamp: string
+  description: string
+  image: string
+  isRead: boolean
+  isFavorite: boolean
   link?: string
 }
 
@@ -79,7 +79,7 @@ export const mockFeedItems: FeedItem[] = [
   },
   {
     id: '7',
-    title: 'Expo SDK 55: What\'s New for Mobile Developers',
+    title: "Expo SDK 55: What's New for Mobile Developers",
     source: 'Expo Blog',
     timestamp: '1 day ago',
     description:
@@ -121,4 +121,4 @@ export const mockFeedItems: FeedItem[] = [
     isRead: true,
     isFavorite: false,
   },
-];
+]
