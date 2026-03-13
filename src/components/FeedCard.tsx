@@ -4,6 +4,9 @@ import { Card, Text, IconButton, useTheme } from 'react-native-paper'
 import type { MD3Theme } from 'react-native-paper'
 import { spacing, shapes } from '../theme/theme'
 import { FeedItem } from '../types/feed'
+import { getRelativeTime } from '../utils/date'
+
+const DEFAULT_IMAGE = require('../../assets/defaults/article-default.png')
 
 interface FeedCardProps {
   item: FeedItem
@@ -13,6 +16,8 @@ interface FeedCardProps {
 
 export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardProps) {
   const theme = useTheme<MD3Theme>()
+
+  console.log('item.timestamp: ', item.timestamp)
 
   return (
     <Card
@@ -27,20 +32,22 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
       onPress={() => onPress?.(item)}
     >
       {/* Hero Image */}
-      {item.image && (
-        <View
-          style={[
-            styles.imageContainer,
-            { borderTopLeftRadius: shapes.extraLarge, borderTopRightRadius: shapes.extraLarge },
-          ]}
-        >
-          <Image source={{ uri: item.image }} style={[styles.image]} resizeMode="cover" />
+      <View
+        style={[
+          styles.imageContainer,
+          { borderTopLeftRadius: shapes.extraLarge, borderTopRightRadius: shapes.extraLarge },
+        ]}
+      >
+        <Image
+          source={item.image ? { uri: item.image } : DEFAULT_IMAGE}
+          style={[styles.image]}
+          resizeMode="cover"
+        />
 
-          {!item.isRead && (
-            <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary }]} />
-          )}
-        </View>
-      )}
+        {!item.isRead && (
+          <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary }]} />
+        )}
+      </View>
 
       <Card.Content style={styles.content}>
         {/* Source & Timestamp row */}
@@ -49,7 +56,7 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
             {item.source}
           </Text>
           <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
-            {item.timestamp}
+            {getRelativeTime(item.timestamp)}
           </Text>
         </View>
 
@@ -73,7 +80,7 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
       </Card.Content>
 
       {/* Actions */}
-      <Card.Actions style={styles.actions}>
+      <View style={styles.actions}>
         <IconButton
           icon={item.isFavorite ? 'heart' : 'heart-outline'}
           iconColor={item.isFavorite ? theme.colors.error : theme.colors.onSurfaceVariant}
@@ -81,18 +88,12 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
           onPress={() => onToggleFavorite?.(item.id)}
         />
         <IconButton
-          icon="share-variant-outline"
+          icon="share-variant"
           iconColor={theme.colors.onSurfaceVariant}
           size={22}
           onPress={() => {}}
         />
-        <IconButton
-          icon="bookmark-outline"
-          iconColor={theme.colors.onSurfaceVariant}
-          size={22}
-          onPress={() => {}}
-        />
-      </Card.Actions>
+      </View>
     </Card>
   )
 }
@@ -137,6 +138,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   actions: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     paddingHorizontal: spacing.sm,
     paddingBottom: spacing.xs,
   },
