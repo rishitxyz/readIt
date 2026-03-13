@@ -11,15 +11,16 @@ import { spacing } from '../theme/theme'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/types'
-import { FeedItem, GroupedFeedItem } from '../types/feed'
 import { fetchAll } from '../services/feed-service'
-import { FEED_SOURCES } from '../config/feed-source'
 import AddNewSource from '../components/modals/AddNewSource'
+import { Article } from '../database/schema/article'
+import { Source } from '../database/schema/source'
+import { SourceWithArticles } from '../database/schema'
 
 export default function FeedScreen() {
   const theme = useTheme<MD3Theme>()
   const [filter, setFilter] = useState<FilterValue>('all')
-  const [feeds, setFeeds] = useState<GroupedFeedItem[]>([])
+  const [feeds, setFeeds] = useState<SourceWithArticles[]>([])
   const [addNewSource, setAddNewSource] = useState<boolean>(false)
   const { fabAnimValue, onScroll } = useScrollAnimation()
 
@@ -31,40 +32,40 @@ export default function FeedScreen() {
         return feeds
           .map((feed) => ({
             ...feed,
-            feedItems: feed.feedItems.filter((item) => !item.isRead),
+            articles: feed.articles.filter((article) => !article.isRead),
           }))
-          .filter((feed) => feed.feedItems.length > 0)
+          .filter((feed) => feed.articles.length > 0)
       case 'favorites':
         return feeds
           .map((feed) => ({
             ...feed,
-            feedItems: feed.feedItems.filter((item) => item.isFavorite),
+            articles: feed.articles.filter((article) => article.isFavourite),
           }))
-          .filter((feed) => feed.feedItems.length > 0)
+          .filter((feed) => feed.articles.length > 0)
       default:
         return feeds
     }
   }, [filter, feeds])
 
-  const toggleFavorite = useCallback((feedItemId: string) => {
+  const toggleFavorite = useCallback((articleId: string) => {
     setFeeds((prev) =>
       prev.map((group) => ({
         ...group,
-        feedItems: group.feedItems.map((feedItem) =>
-          feedItem.id === feedItemId ? { ...feedItem, isFavorite: !feedItem.isFavorite } : feedItem,
+        articles: group.articles.map((article) =>
+          article.id === articleId ? { ...article, isFavorite: !article.isFavourite } : article,
         ),
       })),
     )
   }, [])
 
   const handleCardPress = useCallback(
-    (item: FeedItem) => {
+    (item: Article) => {
       // Mark as read on press
       setFeeds((prev) =>
         prev.map((group) => ({
           ...group,
-          feedItems: group.feedItems.map((feedItem) =>
-            feedItem.id === item.id ? { ...feedItem, isRead: true } : feedItem,
+          articles: group.articles.map((article) =>
+            article.id === item.id ? { ...article, isRead: true } : article,
           ),
         })),
       )
@@ -76,8 +77,12 @@ export default function FeedScreen() {
   )
 
   const renderItem = useCallback(
-    ({ item }: { item: FeedItem }) => (
-      <FeedCard item={item} onToggleFavorite={toggleFavorite} onPress={handleCardPress} />
+    ({ item, section }: { item: Article; section: { title: string; source: Source } }) => (
+      <FeedCard
+        article={{ ...item, source: section.source }}
+        onToggleFavorite={toggleFavorite}
+        onPress={handleCardPress}
+      />
     ),
     [toggleFavorite, handleCardPress],
   )
@@ -86,7 +91,7 @@ export default function FeedScreen() {
     let isMounted = true
 
     const load = async () => {
-      const fetchedFeeds = await fetchAll(FEED_SOURCES)
+      const fetchedFeeds = await fetchAll([])
       if (isMounted) setFeeds(fetchedFeeds)
     }
 
@@ -98,9 +103,10 @@ export default function FeedScreen() {
   }, [])
 
   const sections = useMemo(() => {
-    return filteredItems.map((feed) => ({
-      title: feed.source,
-      data: feed.feedItems,
+    return filteredItems.map((sourceWithArticles) => ({
+      title: sourceWithArticles.source.name,
+      source: sourceWithArticles.source,
+      data: sourceWithArticles.articles,
     }))
   }, [filteredItems])
 

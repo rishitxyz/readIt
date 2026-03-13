@@ -3,21 +3,20 @@ import { View, Image, StyleSheet } from 'react-native'
 import { Card, Text, IconButton, useTheme } from 'react-native-paper'
 import type { MD3Theme } from 'react-native-paper'
 import { spacing, shapes } from '../theme/theme'
-import { FeedItem } from '../types/feed'
 import { getRelativeTime } from '../utils/date'
+import { Article } from '../database/schema/article'
+import { ArticleWithSource } from '../database/schema'
 
 const DEFAULT_IMAGE = require('../../assets/defaults/article-default.png')
 
 interface FeedCardProps {
-  item: FeedItem
+  article: ArticleWithSource
   onToggleFavorite?: (id: string) => void
-  onPress?: (item: FeedItem) => void
+  onPress?: (article: Article) => void
 }
 
-export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardProps) {
+export default function FeedCard({ article, onToggleFavorite, onPress }: FeedCardProps) {
   const theme = useTheme<MD3Theme>()
-
-  console.log('item.timestamp: ', item.timestamp)
 
   return (
     <Card
@@ -29,7 +28,7 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
         },
       ]}
       elevation={1}
-      onPress={() => onPress?.(item)}
+      onPress={() => onPress?.(article)}
     >
       {/* Hero Image */}
       <View
@@ -39,53 +38,50 @@ export default function FeedCard({ item, onToggleFavorite, onPress }: FeedCardPr
         ]}
       >
         <Image
-          source={item.image ? { uri: item.image } : DEFAULT_IMAGE}
+          source={article.imageUrl ? { uri: article.imageUrl } : DEFAULT_IMAGE}
           style={[styles.image]}
           resizeMode="cover"
         />
 
-        {!item.isRead && (
+        {!article.isRead && (
           <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary }]} />
         )}
       </View>
 
       <Card.Content style={styles.content}>
-        {/* Source & Timestamp row */}
         <View style={styles.metaRow}>
           <Text variant="labelMedium" style={{ color: theme.colors.primary, fontWeight: '600' }}>
-            {item.source}
+            {article.source.name}
           </Text>
           <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
-            {getRelativeTime(item.timestamp)}
+            {getRelativeTime(article.publishedAt)}
           </Text>
         </View>
 
-        {/* Title */}
         <Text
           variant="headlineSmall"
           numberOfLines={2}
           style={[styles.title, { color: theme.colors.onSurface }]}
         >
-          {item.title}
+          {article.title}
         </Text>
 
-        {/* Summary */}
         <Text
           variant="bodyMedium"
-          numberOfLines={item.image !== undefined ? 3 : 10}
+          numberOfLines={3}
           style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}
         >
-          {item.description}
+          {article.description}
         </Text>
       </Card.Content>
 
       {/* Actions */}
       <View style={styles.actions}>
         <IconButton
-          icon={item.isFavorite ? 'heart' : 'heart-outline'}
-          iconColor={item.isFavorite ? theme.colors.error : theme.colors.onSurfaceVariant}
+          icon={article.isFavourite ? 'heart' : 'heart-outline'}
+          iconColor={article.isFavourite ? theme.colors.error : theme.colors.onSurfaceVariant}
           size={22}
-          onPress={() => onToggleFavorite?.(item.id)}
+          onPress={() => onToggleFavorite?.(article.id)}
         />
         <IconButton
           icon="share-variant"

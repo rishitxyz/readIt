@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
-import { FeedItem } from '../types/feed'
+import { Article } from '../database/schema/article'
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -34,7 +34,7 @@ const safeExtractString = (field: any): string => {
   return String(field)
 }
 
-export const parseXMLFeed = async (xmlString: string, source: string): Promise<FeedItem[]> => {
+export const parseXMLFeed = async (xmlString: string, source: string): Promise<Article[]> => {
   const jsonObj = parser.parse(xmlString)
   const rawItems = jsonObj?.rss?.channel?.item || jsonObj?.feed?.entry || []
   const itemsArray = Array.isArray(rawItems) ? rawItems : [rawItems]
@@ -56,14 +56,15 @@ export const parseXMLFeed = async (xmlString: string, source: string): Promise<F
 
     return {
       id: item.guid?.['#text'] || item.guid || item.id || Math.random().toString(36).substring(7),
-      title: safeExtractString(item.title) || 'No Title', // Good idea to use it here too!
-      source: source,
+      title: safeExtractString(item.title) || 'No Title',
+      author: '',
+      summary: '',
       description: cleanDescription,
       link: typeof item.link === 'string' ? item.link : item.link?.['@_href'] || '',
-      timestamp: item.pubDate || item.published || new Date().toISOString(),
-      image: item.enclosure?.['@_url'] || item['media:content']?.['@_url'],
+      publishedAt: item.pubDate || item.published || new Date().toISOString(),
+      imageUrl: item.enclosure?.['@_url'] || item['media:content']?.['@_url'],
       isRead: false,
-      isFavorite: false,
+      isFavourite: false,
     }
   })
 }
