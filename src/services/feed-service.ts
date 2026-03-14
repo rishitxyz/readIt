@@ -1,6 +1,6 @@
 import { FeedType, ITEMS_PER_FEED } from '../config/feed-source'
 import { SourceWithArticles } from '../database/schema'
-import { Article } from '../database/schema/article'
+import { Article, CreateArticle } from '../database/schema/article'
 import { Source, SourceValidationError, ValidSource } from '../database/schema/source'
 import { parseXMLFeed, parser } from '../parser/rss-parser'
 
@@ -65,10 +65,10 @@ export const quickFeedCheck = async (url: string): Promise<SourceValidationError
   }
 }
 
-export const fetchRSSFeed = async (source: Source): Promise<Article[]> => {
+export const fetchRSSFeed = async (source: Source): Promise<CreateArticle[]> => {
   const response = await fetch(source.url)
   const xmlString = await response.text()
-  return parseXMLFeed(xmlString, source.name)
+  return parseXMLFeed(xmlString, source.id)
 }
 
 export const fetchAll = async (sources: Source[]): Promise<SourceWithArticles[]> => {

@@ -4,18 +4,19 @@ import { Card, Text, IconButton, useTheme } from 'react-native-paper'
 import type { MD3Theme } from 'react-native-paper'
 import { spacing, shapes } from '../theme/theme'
 import { getRelativeTime } from '../utils/date'
+import { Source } from '../database/schema/source'
 import { Article } from '../database/schema/article'
-import { ArticleWithSource } from '../database/schema'
 
 const DEFAULT_IMAGE = require('../../assets/defaults/article-default.png')
 
 interface FeedCardProps {
-  article: ArticleWithSource
+  source: Source
+  article: Article
   onToggleFavorite?: (id: string) => void
-  onPress?: (article: Article) => void
+  onPress?: (source: Source, article: Article) => void
 }
 
-export default function FeedCard({ article, onToggleFavorite, onPress }: FeedCardProps) {
+export default function FeedCard({ source, article, onToggleFavorite, onPress }: FeedCardProps) {
   const theme = useTheme<MD3Theme>()
 
   return (
@@ -28,7 +29,7 @@ export default function FeedCard({ article, onToggleFavorite, onPress }: FeedCar
         },
       ]}
       elevation={1}
-      onPress={() => onPress?.(article)}
+      onPress={() => onPress?.(source, article)}
     >
       {/* Hero Image */}
       <View
@@ -51,7 +52,7 @@ export default function FeedCard({ article, onToggleFavorite, onPress }: FeedCar
       <Card.Content style={styles.content}>
         <View style={styles.metaRow}>
           <Text variant="labelMedium" style={{ color: theme.colors.primary, fontWeight: '600' }}>
-            {article.source.name}
+            {source.name}
           </Text>
           <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
             {getRelativeTime(article.publishedAt)}

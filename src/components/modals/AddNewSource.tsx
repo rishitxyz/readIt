@@ -13,7 +13,8 @@ import {
 import { FeedType } from '../../config/feed-source'
 import { shapes, spacing } from '../../theme/theme'
 import * as sourceService from '../../services/db/source'
-import { quickFeedCheck } from '../../services/feed-service'
+import * as articleService from '../../services/db/article'
+import { fetchRSSFeed, quickFeedCheck } from '../../services/feed-service'
 
 interface AddNewSourceProps {
   visible: boolean
@@ -48,12 +49,13 @@ const AddNewSource = ({ visible, setVisible, onSourceAdded }: AddNewSourceProps)
         finalUrl = validation.finalUrl
       }
 
-      sourceService.insertNew({
+      const newSource = sourceService.insertNew({
         id: source.trim().toLowerCase(),
         name: source,
         url: finalUrl!,
         type: finalType,
       })
+      articleService.save(await fetchRSSFeed(newSource))
     } catch (error) {
       console.log(error)
       throw new Error('Failed to add new source.')

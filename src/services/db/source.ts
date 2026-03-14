@@ -16,8 +16,8 @@ export const checkIfExists = (name: string, url: string): boolean => {
     .get()
 }
 
-export const insertNew = (createSource: CreateSource): undefined => {
-  db.insert(SourceTable).values(createSource).run()
+export const insertNew = (createSource: CreateSource): Source => {
+  return db.insert(SourceTable).values(createSource).returning().get()
 }
 
 export const deleteById = (id: string): undefined => {

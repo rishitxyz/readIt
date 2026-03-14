@@ -83,10 +83,10 @@ export default function FeedScreen() {
   }, [])
 
   const handleCardPress = useCallback(
-    (item: Article) => {
+    (source: Source, article: Article) => {
       // 1. Save to database in the background if it's currently unread
-      if (!item.isRead) {
-        markArticleAsRead(item.id)
+      if (!article.isRead) {
+        markArticleAsRead(article.id)
       }
 
       // 2. Optimistically update UI
@@ -94,13 +94,13 @@ export default function FeedScreen() {
         prev.map((group) => ({
           ...group,
           articles: group.articles.map((article) =>
-            article.id === item.id ? { ...article, isRead: true } : article,
+            article.id === article.id ? { ...article, isRead: true } : article,
           ),
         })),
       )
 
       // 3. Navigate to article page
-      navigation.navigate('ArticleDetail', { article: item })
+      navigation.navigate('ArticleDetail', { source, article })
     },
     [navigation],
   )
@@ -108,10 +108,11 @@ export default function FeedScreen() {
   const renderItem = useCallback(
     ({ item, section }: { item: Article; section: { title: string; source: Source } }) => (
       <FeedCard
-        article={{ ...item, source: section.source }}
+        source={section.source}
+        article={item}
         // Pass the whole item instead of just the ID to match the new signature
         onToggleFavorite={() => toggleFavoriteCall(item)}
-        onPress={handleCardPress}
+        onPress={() => handleCardPress(section.source, item)}
       />
     ),
     [toggleFavoriteCall, handleCardPress],

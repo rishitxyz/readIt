@@ -34,7 +34,7 @@ const safeExtractString = (field: any): string => {
   return String(field)
 }
 
-export const parseXMLFeed = async (xmlString: string, source: string): Promise<Article[]> => {
+export const parseXMLFeed = async (xmlString: string, sourceId: string): Promise<Article[]> => {
   const jsonObj = parser.parse(xmlString)
   const rawItems = jsonObj?.rss?.channel?.item || jsonObj?.feed?.entry || []
   const itemsArray = Array.isArray(rawItems) ? rawItems : [rawItems]
@@ -59,6 +59,7 @@ export const parseXMLFeed = async (xmlString: string, source: string): Promise<A
       title: safeExtractString(item.title) || 'No Title',
       author: '',
       summary: '',
+      sourceId: sourceId,
       description: cleanDescription,
       link: typeof item.link === 'string' ? item.link : item.link?.['@_href'] || '',
       publishedAt: item.pubDate || item.published || new Date().toISOString(),

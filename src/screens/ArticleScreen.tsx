@@ -12,7 +12,7 @@ const DEFAULT_IMAGE = require('../../assets/defaults/article-default.png')
 type Props = NativeStackScreenProps<RootStackParamList, 'ArticleDetail'>
 
 export default function ArticleDetailScreen({ route, navigation }: Props) {
-  const { article } = route.params
+  const { article, source } = route.params
   const theme = useTheme()
 
   return (
@@ -20,11 +20,11 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
       {/* M3 App Bar with a back button */}
       <Appbar.Header elevated style={{ backgroundColor: theme.colors.surface }}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={article.source || 'Feed'} />
+        <Appbar.Content title={source.name || 'Feed'} />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text variant="labelSmall">{getRelativeTime(article.timestamp)}</Text>
+        <Text variant="labelSmall">{getRelativeTime(article.publishedAt)}</Text>
         <Text
           variant="headlineMedium"
           style={{ color: theme.colors.onSurface, marginBottom: spacing.md }}
@@ -33,7 +33,7 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
         </Text>
 
         <Image
-          source={article.image ? { uri: article.image } : DEFAULT_IMAGE}
+          source={article.imageUrl ? { uri: article.imageUrl } : DEFAULT_IMAGE}
           style={styles.image}
           resizeMode="cover"
         />
