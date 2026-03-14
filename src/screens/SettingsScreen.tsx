@@ -2,6 +2,7 @@ import React from 'react'
 import { View, StyleSheet, ScrollView } from 'react-native'
 import { Appbar, List, Switch, Divider, useTheme } from 'react-native-paper'
 import type { MD3Theme } from 'react-native-paper'
+import { exportDb } from '../utils/user-data'
 
 interface SettingsScreenProps {
   isDarkMode: boolean
@@ -79,6 +80,17 @@ export default function SettingsScreen({ isDarkMode, onToggleDarkMode }: Setting
             right={() => <Switch value={true} color={theme.colors.primary} />}
             titleStyle={{ color: theme.colors.onSurface }}
             descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+          />
+          <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+
+          <List.Item
+            title="Export user data"
+            description="Export local SQLite db file"
+            left={(props) => <List.Icon {...props} icon="export" color={theme.colors.secondary} />}
+            right={() => <List.Icon icon="download-outline" color={theme.colors.primary} />}
+            titleStyle={{ color: theme.colors.onSurface }}
+            descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+            onTouchEnd={exportDb}
           />
 
           <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />

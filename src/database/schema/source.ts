@@ -9,6 +9,7 @@ export const SourceTable = sqliteTable('source', {
   url: text('url').notNull().unique(),
   type: text('type', { enum: [FeedType.RSS, FeedType.SUB_REDDIT] }).notNull(),
   showOnFeed: integer('showOnFeed', { mode: 'boolean' }).default(true).notNull(),
+  // createdAt: text('createdAt').notNull(),
 })
 
 export type Source = typeof SourceTable.$inferSelect

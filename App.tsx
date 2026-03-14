@@ -25,6 +25,7 @@ import FeedScreen from './src/screens/FeedScreen'
 import FavoritesScreen from './src/screens/FavoritesScreen'
 import SettingsScreen from './src/screens/SettingsScreen'
 import { initializeDatabase } from './src/database/schema'
+import SourcesListScreen from './src/screens/SourcesScreen'
 
 initializeDatabase()
 
@@ -50,10 +51,10 @@ const routes: RouteDef[] = [
     unfocusedIcon: 'rss',
   },
   {
-    key: 'favorites',
-    title: 'Favorites',
-    focusedIcon: 'heart',
-    unfocusedIcon: 'heart-outline',
+    key: 'sources',
+    title: 'Sources',
+    focusedIcon: 'list-box',
+    unfocusedIcon: 'list-box-outline',
   },
   {
     key: 'settings',
@@ -79,8 +80,8 @@ function AppContent({
       switch (route.key) {
         case 'feeds':
           return <FeedScreen />
-        case 'favorites':
-          return <FavoritesScreen />
+        case 'sources':
+          return <SourcesListScreen />
         case 'settings':
           return <SettingsScreen isDarkMode={isDarkMode} onToggleDarkMode={onToggleDarkMode} />
         default:

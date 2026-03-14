@@ -3,8 +3,16 @@ import { db, SourceWithArticles } from '../../database/schema'
 import { CreateSource, Source, SourceTable } from '../../database/schema/source'
 import { ArticleTable } from '../../database/schema/article'
 
-export const readById = (id: string): Source | null => {
-  return db.select().from(SourceTable).where(eq(SourceTable.id, id)).get() ?? null
+export const updateById = (id: string, source: Source): Source => {
+  return db.update(SourceTable).set(source).returning().get()
+}
+
+export const getAllSources = (): Source[] => {
+  return db.select().from(SourceTable).all()
+}
+
+export const readById = (id: string): Source | undefined => {
+  return db.select().from(SourceTable).where(eq(SourceTable.id, id)).get()
 }
 
 export const checkIfExists = (name: string, url: string): boolean => {
