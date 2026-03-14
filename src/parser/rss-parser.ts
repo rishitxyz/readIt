@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser'
 import { Article } from '../database/schema/article'
 
-const parser = new XMLParser({
+export const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: '@_',
   textNodeName: '#text',

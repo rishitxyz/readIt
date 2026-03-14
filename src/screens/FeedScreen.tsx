@@ -174,7 +174,11 @@ export default function FeedScreen() {
                 marginTop: spacing.sm,
               }}
             >
-              {filter === 'favorites' ? 'Heart some articles to see them here!' : 'All caught up!'}
+              {filter === 'favorites'
+                ? 'Heart some articles to see them here!'
+                : filter === 'unread'
+                  ? 'All caught up!'
+                  : 'Add new feeds by clicking on the plus button'}
             </Text>
           </View>
         }

@@ -1,6 +1,6 @@
 export enum FeedType {
   RSS = 'rss',
-  REDDIT = 'reddit',
+  SUB_REDDIT = 'subreddit',
 }
 
 export interface FeedSource {
@@ -17,7 +17,7 @@ export const generateRedditSource = (subreddit: string): FeedSource => {
     id: `r/${subreddit.toLowerCase()}`,
     name: `r/${subreddit}`,
     url: `https://www.reddit.com/r/${subreddit.toLowerCase()}/.rss`,
-    type: FeedType.REDDIT,
+    type: FeedType.SUB_REDDIT,
   }
 }
 

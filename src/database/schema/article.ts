@@ -1,4 +1,6 @@
+// src/database/schema/article.ts
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { SourceTable } from './source'
 
 export const ArticleTable = sqliteTable('article', {
   id: text('id').primaryKey(),
@@ -6,11 +8,14 @@ export const ArticleTable = sqliteTable('article', {
   author: text('author').notNull().default('Unknown'),
   summary: text('summary'),
   description: text('description').notNull(),
+  sourceId: text('sourceId')
+    .notNull()
+    .references(() => SourceTable.id, { onDelete: 'cascade' }),
   link: text('link'),
   imageUrl: text('imageUrl'),
   publishedAt: text('publishedAt').notNull(),
   isRead: integer('isRead', { mode: 'boolean' }).default(false).notNull(),
-  isFavourite: integer('isFavourite', { mode: 'boolean' }).default(false).notNull(),
+  isFavourite: integer('isFavourite', { mode: 'boolean' }).default(false).notNull(), // Matching the British spelling
 })
 
 export type Article = typeof ArticleTable.$inferSelect

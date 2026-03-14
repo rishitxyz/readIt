@@ -24,6 +24,9 @@ import { LightTheme, DarkTheme } from './src/theme/theme'
 import FeedScreen from './src/screens/FeedScreen'
 import FavoritesScreen from './src/screens/FavoritesScreen'
 import SettingsScreen from './src/screens/SettingsScreen'
+import { initializeDatabase } from './src/database/schema'
+
+initializeDatabase()
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync()

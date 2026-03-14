@@ -10,8 +10,10 @@ import {
   TextInput,
   useTheme,
 } from 'react-native-paper'
-import { FEED_SOURCES, FeedType } from '../../config/feed-source'
+import { FeedType } from '../../config/feed-source'
 import { shapes, spacing } from '../../theme/theme'
+import * as sourceService from '../../services/db/source'
+import { quickFeedCheck } from '../../services/feed-service'
 
 interface AddNewSourceProps {
   visible: boolean
@@ -20,20 +22,44 @@ interface AddNewSourceProps {
 
 const AddNewSource = ({ visible, setVisible }: AddNewSourceProps) => {
   const [sourceType, setSourceType] = React.useState<FeedType>(FeedType.RSS)
-  const [source, setSource] = React.useState<string>('')
+  const [source, setSource] = React.useState<string>()
+  const [sourceUrl, setSourceUrl] = React.useState<string>()
   const [loading, setLoading] = React.useState<boolean>(false)
   const theme = useTheme<MD3Theme>()
 
-  const addNewSource = () => {
-    console.log('yes')
+  const addNewSource = async () => {
+    if (source === undefined || source === null || source === '' || sourceUrl === undefined)
+      throw new Error('Invalid source name.')
     setLoading(true)
-    FEED_SOURCES.push({
-      id: '',
-      name: '',
-      url: source,
-      type: sourceType,
-    })
-    // setLoading(false)
+
+    try {
+      let finalType = sourceType
+      let finalUrl = sourceUrl
+
+      if (sourceType === FeedType.RSS && sourceUrl) {
+        const validation = await quickFeedCheck(sourceUrl)
+
+        if (!validation.isValid) {
+          throw new Error(validation.error)
+        }
+
+        finalType = validation.type
+        finalUrl = validation.finalUrl
+      }
+
+      sourceService.insertNew({
+        id: source.trim().toLowerCase(),
+        name: source,
+        url: finalUrl!,
+        type: finalType,
+      })
+    } catch (error) {
+      console.log(error)
+      throw new Error('Failed to add new source.')
+    } finally {
+      setLoading(false)
+      setVisible(false)
+    }
   }
 
   return (
@@ -60,8 +86,8 @@ const AddNewSource = ({ visible, setVisible }: AddNewSourceProps) => {
                 uncheckedColor: theme.colors.onSurfaceVariant,
               },
               {
-                value: FeedType.REDDIT,
-                label: 'SubReddit',
+                value: FeedType.SUB_REDDIT,
+                label: 'Subreddit',
                 icon: 'reddit',
                 checkedColor: theme.colors.onPrimaryContainer,
                 uncheckedColor: theme.colors.onSurfaceVariant,
@@ -70,15 +96,28 @@ const AddNewSource = ({ visible, setVisible }: AddNewSourceProps) => {
           />
           <TextInput
             mode="outlined"
-            label="Add source"
+            textContentType="name"
+            label="Give it a name"
             value={source}
             onChangeText={(text) => setSource(text)}
-            left={<TextInput.Affix text={sourceType === FeedType.REDDIT ? 'r/' : ''} />}
+            left={<TextInput.Affix text={sourceType === FeedType.SUB_REDDIT ? 'r/' : ''} />}
+          />
+          <TextInput
+            mode="outlined"
+            textContentType="URL"
+            label={sourceType === FeedType.RSS ? 'Feed URL' : 'Subreddit name'}
+            value={sourceUrl}
+            onChangeText={(text) => setSourceUrl(text)}
+            left={<TextInput.Affix text={sourceType === FeedType.SUB_REDDIT ? 'r/' : ''} />}
           />
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingTop: spacing.lg }}>
           <Button onTouchEnd={() => setVisible(false)}>Cancel</Button>
-          <Button mode="contained" onTouchEnd={addNewSource} disabled={source === ''}>
+          <Button
+            mode="contained"
+            onTouchEnd={addNewSource}
+            disabled={source === undefined || source === null || source === ''}
+          >
             {loading ? <ActivityIndicator color="#FFFFFF" /> : 'Add'}
           </Button>
         </View>
