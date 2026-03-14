@@ -18,9 +18,10 @@ import { quickFeedCheck } from '../../services/feed-service'
 interface AddNewSourceProps {
   visible: boolean
   setVisible: React.Dispatch<React.SetStateAction<boolean>>
+  onSourceAdded: () => void
 }
 
-const AddNewSource = ({ visible, setVisible }: AddNewSourceProps) => {
+const AddNewSource = ({ visible, setVisible, onSourceAdded }: AddNewSourceProps) => {
   const [sourceType, setSourceType] = React.useState<FeedType>(FeedType.RSS)
   const [source, setSource] = React.useState<string>()
   const [sourceUrl, setSourceUrl] = React.useState<string>()
@@ -59,6 +60,7 @@ const AddNewSource = ({ visible, setVisible }: AddNewSourceProps) => {
     } finally {
       setLoading(false)
       setVisible(false)
+      onSourceAdded()
     }
   }
 

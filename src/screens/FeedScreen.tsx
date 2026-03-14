@@ -11,7 +11,11 @@ import { spacing } from '../theme/theme'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/types'
-import { fetchAll } from '../services/feed-service'
+
+// Add these imports to access your Drizzle database functions
+import { getSourcesWithLatestArticles } from '../services/db/source'
+import { markArticleAsRead, toggleFavourite } from '../services/db/article' // Adjust this path to where you saved your CRUD helpers
+
 import AddNewSource from '../components/modals/AddNewSource'
 import { Article } from '../database/schema/article'
 import { Source } from '../database/schema/source'
@@ -26,6 +30,18 @@ export default function FeedScreen() {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  // ── Database Fetching ──
+  const loadFeeds = useCallback(async () => {
+    // Synchronously fetch data from SQLite via Drizzle
+    const fetchedFeeds = await getSourcesWithLatestArticles()
+    setFeeds(fetchedFeeds)
+  }, [])
+
+  useEffect(() => {
+    loadFeeds()
+  }, [loadFeeds])
+
+  // ── Data Filtering ──
   const filteredItems = useMemo(() => {
     switch (filter) {
       case 'unread':
@@ -47,12 +63,20 @@ export default function FeedScreen() {
     }
   }, [filter, feeds])
 
-  const toggleFavorite = useCallback((articleId: string) => {
+  // ── Actions ──
+  // Updated to receive the whole article so we know its exact current state
+  const toggleFavoriteCall = useCallback((article: Article) => {
+    const newFavoriteStatus = !article.isFavourite
+
+    // 1. Save to database in the background
+    toggleFavourite(article.id, newFavoriteStatus)
+
+    // 2. Optimistically update UI
     setFeeds((prev) =>
       prev.map((group) => ({
         ...group,
-        articles: group.articles.map((article) =>
-          article.id === articleId ? { ...article, isFavorite: !article.isFavourite } : article,
+        articles: group.articles.map((a) =>
+          a.id === article.id ? { ...a, isFavourite: newFavoriteStatus } : a,
         ),
       })),
     )
@@ -60,7 +84,12 @@ export default function FeedScreen() {
 
   const handleCardPress = useCallback(
     (item: Article) => {
-      // Mark as read on press
+      // 1. Save to database in the background if it's currently unread
+      if (!item.isRead) {
+        markArticleAsRead(item.id)
+      }
+
+      // 2. Optimistically update UI
       setFeeds((prev) =>
         prev.map((group) => ({
           ...group,
@@ -70,7 +99,7 @@ export default function FeedScreen() {
         })),
       )
 
-      // handle navigation to article page.
+      // 3. Navigate to article page
       navigation.navigate('ArticleDetail', { article: item })
     },
     [navigation],
@@ -80,32 +109,30 @@ export default function FeedScreen() {
     ({ item, section }: { item: Article; section: { title: string; source: Source } }) => (
       <FeedCard
         article={{ ...item, source: section.source }}
-        onToggleFavorite={toggleFavorite}
+        // Pass the whole item instead of just the ID to match the new signature
+        onToggleFavorite={() => toggleFavoriteCall(item)}
         onPress={handleCardPress}
       />
     ),
-    [toggleFavorite, handleCardPress],
+    [toggleFavoriteCall, handleCardPress],
   )
 
-  useEffect(() => {
-    let isMounted = true
+  type FeedSection = {
+    title: string
+    source: Source
+    data: Article[]
+  }
 
-    const load = async () => {
-      const fetchedFeeds = await fetchAll([])
-      if (isMounted) setFeeds(fetchedFeeds)
-    }
-
-    void load()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
-  const sections = useMemo(() => {
+  const sections = useMemo<FeedSection[]>(() => {
     return filteredItems.map((sourceWithArticles) => ({
-      title: sourceWithArticles.source.name,
-      source: sourceWithArticles.source,
+      title: sourceWithArticles.name,
+      source: {
+        id: sourceWithArticles.id,
+        name: sourceWithArticles.name,
+        url: sourceWithArticles.url,
+        type: sourceWithArticles.type,
+        showOnFeed: sourceWithArticles.showOnFeed,
+      },
       data: sourceWithArticles.articles,
     }))
   }, [filteredItems])
@@ -190,7 +217,9 @@ export default function FeedScreen() {
           setAddNewSource(!addNewSource)
         }}
       />
-      <AddNewSource visible={addNewSource} setVisible={setAddNewSource} />
+
+      {/* Pass the loadFeeds function as a prop so the modal can trigger a refresh! */}
+      <AddNewSource visible={addNewSource} setVisible={setAddNewSource} onSourceAdded={loadFeeds} />
     </View>
   )
 }

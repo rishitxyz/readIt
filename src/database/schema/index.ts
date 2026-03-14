@@ -37,9 +37,6 @@ export function initializeDatabase() {
   `)
 }
 
-export interface SourceWithArticles {
-  source: sourceSchema.Source
-  articles: articleSchema.Article[]
-}
+export type SourceWithArticles = sourceSchema.Source & { articles: articleSchema.Article[] }
 
 export type ArticleWithSource = articleSchema.Article & { source: sourceSchema.Source }

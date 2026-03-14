@@ -1,5 +1,7 @@
+import { relations } from 'drizzle-orm'
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { FeedType } from '../../config/feed-source'
+import { ArticleTable } from './article'
 
 export const SourceTable = sqliteTable('source', {
   id: text('id').primaryKey(),
@@ -22,3 +24,7 @@ export interface ValidSource {
   type: FeedType
   finalUrl: string
 }
+
+export const sourceRelations = relations(SourceTable, ({ many }) => ({
+  articles: many(ArticleTable),
+}))
