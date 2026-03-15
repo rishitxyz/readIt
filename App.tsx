@@ -20,12 +20,19 @@ import {
   FiraSans_700Bold,
 } from '@expo-google-fonts/fira-sans'
 
-import { LightTheme, DarkTheme } from './src/theme/theme'
+import {
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins'
+
+import { LightTheme, DarkTheme, getDynamicFonts } from './src/theme/theme'
 import FeedScreen from './src/screens/FeedScreen'
-import FavoritesScreen from './src/screens/FavoritesScreen'
 import SettingsScreen from './src/screens/SettingsScreen'
 import { initializeDatabase } from './src/database/schema'
 import SourcesListScreen from './src/screens/SourcesScreen'
+import { fontOptions, fontOptionsType } from './src/theme/font'
 
 initializeDatabase()
 
@@ -68,9 +75,13 @@ const routes: RouteDef[] = [
 function AppContent({
   isDarkMode,
   onToggleDarkMode,
+  currentFont,
+  onChangeFont,
 }: {
   isDarkMode: boolean
   onToggleDarkMode: () => void
+  currentFont: string
+  onChangeFont: (font: fontOptionsType) => void
 }) {
   const theme = useTheme<MD3Theme>()
   const [index, setIndex] = useState(0)
@@ -83,12 +94,19 @@ function AppContent({
         case 'sources':
           return <SourcesListScreen />
         case 'settings':
-          return <SettingsScreen isDarkMode={isDarkMode} onToggleDarkMode={onToggleDarkMode} />
+          return (
+            <SettingsScreen
+              isDarkMode={isDarkMode}
+              onToggleDarkMode={onToggleDarkMode}
+              currentFont={currentFont}
+              onChangeFont={onChangeFont}
+            />
+          )
         default:
           return null
       }
     },
-    [isDarkMode, onToggleDarkMode],
+    [isDarkMode, onToggleDarkMode, currentFont, onChangeFont],
   )
 
   return (
@@ -118,14 +136,21 @@ function AppContent({
 
 // ── Root App ─────────────────────────────────────────────────────────
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
+  const [selectedFont, setSelectedFont] = useState<fontOptionsType>(fontOptions.firaSans.value)
 
   // 1. Load the FiraSans fonts
   const [fontsLoaded, fontError] = useFonts({
+    // Fira Sans
     FiraSans_400Regular,
     FiraSans_500Medium,
     FiraSans_600SemiBold,
     FiraSans_700Bold,
+    // Poppins
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
   })
 
   // 2. Hide splash screen when fonts are ready
@@ -138,8 +163,18 @@ export default function App() {
   const toggleDarkMode = useCallback(() => {
     setIsDarkMode((prev) => !prev)
   }, [])
+  const changeFont = useCallback((font: fontOptionsType) => {
+    setSelectedFont(font)
+  }, [])
 
-  const theme = useMemo(() => (isDarkMode ? DarkTheme : LightTheme), [isDarkMode])
+  const theme = useMemo(() => {
+    const baseTheme = isDarkMode ? DarkTheme : LightTheme
+    const dynamicFonts = getDynamicFonts(selectedFont)
+    return {
+      ...baseTheme,
+      fonts: dynamicFonts,
+    }
+  }, [isDarkMode, selectedFont])
 
   // 3. Render nothing until fonts are loaded (splash screen remains)
   if (!fontsLoaded && !fontError) {
@@ -153,7 +188,14 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="MainTabs">
-              {() => <AppContent isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />}
+              {() => (
+                <AppContent
+                  isDarkMode={isDarkMode}
+                  onToggleDarkMode={toggleDarkMode}
+                  currentFont={selectedFont}
+                  onChangeFont={changeFont}
+                />
+              )}
             </Stack.Screen>
             <Stack.Screen name="ArticleDetail" component={ArticleScreen} />
           </Stack.Navigator>

@@ -1,15 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, StyleSheet, ScrollView } from 'react-native'
-import { Appbar, List, Switch, Divider, useTheme } from 'react-native-paper'
+import { Appbar, List, Switch, Divider, Menu, useTheme, Button } from 'react-native-paper'
 import type { MD3Theme } from 'react-native-paper'
 import { exportDb } from '../utils/user-data'
+import { fontOptions, fontOptionsType } from '../theme/font'
 
 interface SettingsScreenProps {
   isDarkMode: boolean
   onToggleDarkMode: () => void
+  currentFont: string
+  onChangeFont: (font: fontOptionsType) => void
 }
 
-export default function SettingsScreen({ isDarkMode, onToggleDarkMode }: SettingsScreenProps) {
+export default function SettingsScreen({
+  isDarkMode,
+  onToggleDarkMode,
+  currentFont,
+  onChangeFont,
+}: SettingsScreenProps) {
+  const [openFontMenu, setOpenFontMenu] = useState<boolean>(false)
   const theme = useTheme<MD3Theme>()
 
   return (
@@ -81,6 +90,34 @@ export default function SettingsScreen({ isDarkMode, onToggleDarkMode }: Setting
             titleStyle={{ color: theme.colors.onSurface }}
             descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
           />
+          <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
+
+          <List.Item
+            title="Change display font"
+            description="Font for app display"
+            left={(props) => (
+              <List.Icon {...props} icon="format-font" color={theme.colors.secondary} />
+            )}
+            right={() => (
+              <Menu
+                visible={openFontMenu}
+                onDismiss={() => setOpenFontMenu(false)}
+                anchor={<Button onPress={() => setOpenFontMenu(true)}>{currentFont}</Button>}
+              >
+                {Object.values(fontOptions).map(({ displayName, value }, index) => (
+                  <Menu.Item
+                    key={index}
+                    title={displayName}
+                    onPress={() => {
+                      onChangeFont(value)
+                      setOpenFontMenu(false)
+                    }}
+                  />
+                ))}
+              </Menu>
+            )}
+          />
+
           <Divider style={{ backgroundColor: theme.colors.outlineVariant }} />
 
           <List.Item
