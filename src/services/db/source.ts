@@ -1,4 +1,4 @@
-import { eq, or, desc } from 'drizzle-orm'
+import { eq, or, desc, asc } from 'drizzle-orm'
 import { db, SourceWithArticles } from '../../database/schema'
 import { CreateSource, Source, SourceTable } from '../../database/schema/source'
 import { ArticleTable } from '../../database/schema/article'
@@ -8,7 +8,7 @@ export const updateById = (id: string, source: Source): Source => {
 }
 
 export const getAllSources = (): Source[] => {
-  return db.select().from(SourceTable).all()
+  return db.select().from(SourceTable).orderBy(asc(SourceTable.createdAt)).all()
 }
 
 export const readById = (id: string): Source | undefined => {

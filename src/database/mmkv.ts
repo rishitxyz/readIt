@@ -1,0 +1,8 @@
+import { createMMKV } from 'react-native-mmkv'
+
+export const storage = createMMKV()
+
+export const STORAGE_KEYS = {
+  APP_FONT: 'app_font',
+  APP_DISPLAY_MODE: 'app_display_mode',
+}

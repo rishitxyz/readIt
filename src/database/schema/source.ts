@@ -1,7 +1,6 @@
-import { relations } from 'drizzle-orm'
+// src/database/schema/source.ts
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
-import { FeedType } from '../../config/feed-source'
-import { ArticleTable } from './article'
+import { FeedType } from '../../config/feed-source' // Adjust if needed
 
 export const SourceTable = sqliteTable('source', {
   id: text('id').primaryKey(),
@@ -9,7 +8,7 @@ export const SourceTable = sqliteTable('source', {
   url: text('url').notNull().unique(),
   type: text('type', { enum: [FeedType.RSS, FeedType.SUB_REDDIT] }).notNull(),
   showOnFeed: integer('showOnFeed', { mode: 'boolean' }).default(true).notNull(),
-  // createdAt: text('createdAt').notNull(),
+  createdAt: text('createdAt').default('CURRENT_TIMESTAMP').notNull(),
 })
 
 export type Source = typeof SourceTable.$inferSelect
@@ -25,7 +24,3 @@ export interface ValidSource {
   type: FeedType
   finalUrl: string
 }
-
-export const sourceRelations = relations(SourceTable, ({ many }) => ({
-  articles: many(ArticleTable),
-}))

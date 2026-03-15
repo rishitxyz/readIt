@@ -1,7 +1,5 @@
-// src/database/schema/article.ts
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { SourceTable } from './source'
-import { relations } from 'drizzle-orm'
 
 export const ArticleTable = sqliteTable('article', {
   id: text('id').primaryKey(),
@@ -16,15 +14,8 @@ export const ArticleTable = sqliteTable('article', {
   imageUrl: text('imageUrl'),
   publishedAt: text('publishedAt').notNull(),
   isRead: integer('isRead', { mode: 'boolean' }).default(false).notNull(),
-  isFavourite: integer('isFavourite', { mode: 'boolean' }).default(false).notNull(), // Matching the British spelling
+  isFavourite: integer('isFavourite', { mode: 'boolean' }).default(false).notNull(),
 })
 
 export type Article = typeof ArticleTable.$inferSelect
 export type CreateArticle = typeof ArticleTable.$inferInsert
-
-export const articleRelation = relations(ArticleTable, ({ one }) => ({
-  source: one(SourceTable, {
-    fields: [ArticleTable.sourceId],
-    references: [SourceTable.id],
-  }),
-}))

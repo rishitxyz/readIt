@@ -33,6 +33,7 @@ import SettingsScreen from './src/screens/SettingsScreen'
 import { initializeDatabase } from './src/database/schema'
 import SourcesListScreen from './src/screens/SourcesScreen'
 import { fontOptions, fontOptionsType } from './src/theme/font'
+import { storage, STORAGE_KEYS } from './src/database/mmkv'
 
 initializeDatabase()
 
@@ -136,8 +137,12 @@ function AppContent({
 
 // ── Root App ─────────────────────────────────────────────────────────
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
-  const [selectedFont, setSelectedFont] = useState<fontOptionsType>(fontOptions.firaSans.value)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(
+    storage.getBoolean(STORAGE_KEYS.APP_DISPLAY_MODE) ?? false,
+  )
+  const [selectedFont, setSelectedFont] = useState<fontOptionsType>(
+    (storage.getString(STORAGE_KEYS.APP_FONT) as fontOptionsType) ?? fontOptions.firaSans.value,
+  )
 
   // 1. Load the FiraSans fonts
   const [fontsLoaded, fontError] = useFonts({
@@ -161,10 +166,14 @@ export default function App() {
   }, [fontsLoaded, fontError])
 
   const toggleDarkMode = useCallback(() => {
-    setIsDarkMode((prev) => !prev)
+    setIsDarkMode((prev) => {
+      storage.set(STORAGE_KEYS.APP_DISPLAY_MODE, !prev)
+      return !prev
+    })
   }, [])
   const changeFont = useCallback((font: fontOptionsType) => {
     setSelectedFont(font)
+    storage.set(STORAGE_KEYS.APP_FONT, font)
   }, [])
 
   const theme = useMemo(() => {
